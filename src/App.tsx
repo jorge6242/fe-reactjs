@@ -1,25 +1,31 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import CircularProgress from '@mui/material/CircularProgress';
+import PrivateRoute from './components/PrivateRoute';
+import ContentAdmin from './components/Content';
+
+const AdminDashboard = lazy(() => import('./components/Admin'));
+const UserDashboard = lazy(() => import('./components/Users'));
+const ThemeAdmin = lazy(() => import('./components/Theme'));
+const CategoryAdmin = lazy(() => import('./components/Category'));
+const Login = lazy(() => import('./components/Login'));
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Suspense fallback={<CircularProgress />}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/dashboard" element={<PrivateRoute><AdminDashboard /></PrivateRoute>}>
+            <Route path="users" element={<UserDashboard />} /> 
+            <Route path="themes" element={<ThemeAdmin />} />  
+            <Route path="content" element={<ContentAdmin />} />  
+            <Route path="categories" element={<CategoryAdmin />} />
+          </Route>
+          <Route path="/" element={<PrivateRoute><AdminDashboard /></PrivateRoute>} />
+        </Routes>
+      </Suspense>
+    </Router>
   );
 }
 
