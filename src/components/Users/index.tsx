@@ -98,11 +98,17 @@ const UserDashboard = () => {
 
   return (
     <Box sx={{ padding: 3 }}>
-      <Typography variant="h4" gutterBottom>User Dashboard</Typography>
-      <Button variant="contained" color="primary" onClick={handleCreateNew} sx={{ mb: 2 }}>
-        Create New User
-      </Button>
-      <SearchBar onSearch={handleSearch} />
+      <Typography variant="h4" gutterBottom>User</Typography>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Box flexGrow={1}>
+          <Button variant="contained" color="primary" onClick={handleCreateNew}>
+            Create New User
+          </Button>
+        </Box>
+        <Box width="50%">  {/* Ajusta el ancho aquí */}
+          <SearchBar onSearch={handleSearch} />
+        </Box>
+      </Box>
       <DataTable data={users} columns={columns} onSelectRow={handleSelectRow} />
       <CustomModal open={modalOpen} onClose={() => setModalOpen(false)} title={selectedUser?.id ? "Edit User" : "Create User"}>
         {selectedUser && <UserForm defaultValues={selectedUser} onSubmit={handleSubmit} roles={roles} />}

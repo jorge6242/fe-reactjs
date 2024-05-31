@@ -75,7 +75,7 @@ const CategoryAdmin = () => {
   return (
     <Box sx={{ padding: 3 }}>
       <Typography variant="h4" gutterBottom>
-        Category Dashboard
+        Category
       </Typography>
       <Button
         variant="contained"

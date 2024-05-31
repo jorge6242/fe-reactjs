@@ -85,17 +85,24 @@ const ThemeAdmin = () => {
   return (
     <Box sx={{ padding: 3 }}>
       <Typography variant="h4" gutterBottom>
-        Theme Dashboard
+        Theme
       </Typography>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleCreateNew}
-        sx={{ mb: 2 }}
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={2}
       >
-        Create New Theme
-      </Button>
-      <SearchBar onSearch={handleSearch} />
+        <Box flexGrow={1}>
+          <Button variant="contained" color="primary" onClick={handleCreateNew}>
+            Create New Theme
+          </Button>
+        </Box>
+        <Box width="50%">
+          {/* Ajusta el ancho aquí */}
+          <SearchBar onSearch={handleSearch} />
+        </Box>
+      </Box>
       <DataTable
         data={themes}
         columns={columns}

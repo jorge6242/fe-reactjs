@@ -118,17 +118,18 @@ const ContentAdmin: React.FC = () => {
   return (
     <Box sx={{ padding: 3 }}>
       <Typography variant="h4" gutterBottom>
-        Content Management
+        Content
       </Typography>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleCreateNew}
-        sx={{ mt: 2 }}
-      >
-        Add New Content
-      </Button>
-      <SearchBar onSearch={handleSearch} />
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Box flexGrow={1}>
+          <Button variant="contained" color="primary" onClick={handleCreateNew}>
+            Add New Content
+          </Button>
+        </Box>
+        <Box width="50%">  {/* Ajusta el ancho aquí */}
+          <SearchBar onSearch={handleSearch} />
+        </Box>
+      </Box>
       <DataTable
         data={contents}
         columns={columns}
