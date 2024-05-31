@@ -5,12 +5,15 @@ import CustomModal from '../Modal';
 import UserForm, { IUserForm } from '../UserForm';
 import { User, getUserList, createUser, updateUser } from '../../services/user.service';
 import { GetRolesRes, getRoles } from '../../services/role.service';
+import useSnackbarStore from '../../store/useSnackbarStore';
+import SearchBar from '../SearchBar';
 
 const UserDashboard = () => {
   const [ roles, setRoles ] = useState<GetRolesRes[]>([])
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<IUserForm | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const setMessage = useSnackbarStore((state) => state.setMessage);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -35,16 +38,38 @@ const UserDashboard = () => {
   };
 
   const handleSubmit = async (userData: IUserForm) => {
+    let res = null;
     if (selectedUser && selectedUser.id) {
-      await updateUser(selectedUser.id, { ...userData, roles: [userData.role] });
+      res = await updateUser(selectedUser.id, { ...userData, roles: [userData.role] });
     } else {
-      await createUser({ ...userData, roles: [userData.role] });
+      res = await createUser({ ...userData, roles: [userData.role] });
+    }
+
+    if (res?.response?.data.message === "Access denied.") {
+      setMessage("No tiene permisos para esta operación", "error");
+    } else {
+      setMessage(
+        `Registro ${
+          selectedUser && selectedUser.id ? "Actualizado" : "Creado"
+        }`,
+        "success"
+      );
     }
 
     const updatedUsers = await getUserList();
     setUsers(updatedUsers);
     setModalOpen(false);
     setSelectedUser(null); 
+  };
+
+  const handleSearch = async (searchTerm: string) => {
+    try {
+      const userList = await getUserList(searchTerm);
+      setUsers(userList);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      setMessage('Failed to fetch users', 'error');
+    }
   };
 
   const columns = [
@@ -77,6 +102,7 @@ const UserDashboard = () => {
       <Button variant="contained" color="primary" onClick={handleCreateNew} sx={{ mb: 2 }}>
         Create New User
       </Button>
+      <SearchBar onSearch={handleSearch} />
       <DataTable data={users} columns={columns} onSelectRow={handleSelectRow} />
       <CustomModal open={modalOpen} onClose={() => setModalOpen(false)} title={selectedUser?.id ? "Edit User" : "Create User"}>
         {selectedUser && <UserForm defaultValues={selectedUser} onSubmit={handleSubmit} roles={roles} />}

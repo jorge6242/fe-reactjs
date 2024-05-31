@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import CircularProgress from '@mui/material/CircularProgress';
 import PrivateRoute from './components/PrivateRoute';
 import ContentAdmin from './components/Content';
+import CustomSnackbar from './components/CustomSnackBar';
 
 const AdminDashboard = lazy(() => import('./components/Admin'));
 const UserDashboard = lazy(() => import('./components/Users'));
@@ -24,6 +25,7 @@ function App() {
           </Route>
           <Route path="/" element={<PrivateRoute><AdminDashboard /></PrivateRoute>} />
         </Routes>
+        <CustomSnackbar />
       </Suspense>
     </Router>
   );

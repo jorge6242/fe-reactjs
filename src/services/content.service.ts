@@ -1,16 +1,18 @@
-import { client } from '../config/axios';
+import { client } from "../config/axios";
 
 export interface GetContentRes {
   _id: string;
-  name: string
+  name: string;
+  categoryId: string;
+  themeId: string;
   theme: {
-    _id: string
-    name: string
+    _id: string;
+    name: string;
   };
   category: {
-    _id: string
-    name: string
-    description: string
+    _id: string;
+    name: string;
+    description: string;
   };
 }
 
@@ -21,9 +23,11 @@ export interface ContentPayload {
   userId: string;
 }
 
-export const getContentList = async (): Promise<GetContentRes[]> => {
-  const { data } = await client.get("/content");
-  console.log('data ', data);
+export const getContentList = async (
+  search?: string
+): Promise<GetContentRes[]> => {
+  const { data } = await client.get("/content", { params: { search } });
+  console.log("data ", data);
   return data;
 };
 
@@ -32,7 +36,7 @@ export const createContent = async (contentData: ContentPayload) => {
     const { data } = await client.post("/content", contentData);
     return data;
   } catch (error) {
-    return error
+    return error;
   }
 };
 
@@ -44,6 +48,6 @@ export const updateContent = async (
     const { data } = await client.put(`/content/${id}`, contentData);
     return data;
   } catch (error) {
-    return error
+    return error;
   }
 };

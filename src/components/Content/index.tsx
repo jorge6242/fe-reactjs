@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Typography, Box, Button, Snackbar, Alert } from "@mui/material";
+import { Typography, Box, Button } from "@mui/material";
 import DataTable from "../DataTable";
 import CustomModal from "../Modal";
 import {
@@ -15,10 +15,14 @@ import {
   getCategoryList,
 } from "../../services/category.service";
 import ContentForm from "../ContentForm";
+import useSnackbarStore from "../../store/useSnackbarStore";
+import SearchBar from '../SearchBar';
 
 const contentDefault: GetContentRes = {
   _id: "",
   name: "",
+  categoryId: "",
+  themeId: "",
   theme: {
     _id: "",
     name: "",
@@ -27,19 +31,18 @@ const contentDefault: GetContentRes = {
     _id: "",
     name: "",
     description: "",
-  }
+  },
 };
 
 const ContentAdmin: React.FC = () => {
   const [contents, setContents] = useState<GetContentRes[]>([]);
   const [themes, setThemes] = useState<GetThemeRes[]>([]);
   const [categories, setCategories] = useState<GetCategoryRes[]>([]);
-  const [selectedContent, setSelectedContent] = useState<GetContentRes>(contentDefault);
+  const [selectedContent, setSelectedContent] =
+    useState<GetContentRes>(contentDefault);
   const [modalOpen, setModalOpen] = useState(false);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [message, setMessage] = useState("");
   const localUser = localStorage.getItem("user");
+  const setMessage = useSnackbarStore((state) => state.setMessage);
 
   useEffect(() => {
     const fetchContents = async () => {
@@ -64,25 +67,40 @@ const ContentAdmin: React.FC = () => {
     setModalOpen(true);
   };
 
+  const handleSearch = async (searchTerm: string) => {
+    try {
+      const contentList = await getContentList(searchTerm);
+      setContents(contentList);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      setMessage('Failed to fetch users', 'error');
+    }
+  };
+
   const handleSubmit = async (contentData: IContentFormData) => {
     const currentUser = JSON.parse(localUser as string);
     let res = null;
+    const payload = {
+      name: contentData.name,
+      themeId: contentData.themeId,
+      categoryId: contentData.categoryId,
+      userId: currentUser ? currentUser.id : "",
+    };
     if (selectedContent && selectedContent._id) {
-      res = await updateContent(selectedContent._id, {
-        ...contentData,
-        userId: currentUser ? currentUser.id : "",
-      });
+      res = await updateContent(selectedContent._id, payload);
     } else {
-      res = await createContent({ ...contentData, userId: currentUser ? currentUser.id : "" });
+      res = await createContent(payload);
     }
-    setSnackbarOpen(true);
-    if(res?.response?.data.message === 'Access denied.'){
-      setIsError(true)
-      setMessage("No tiene permisos para esta operación");
-      
+
+    if (res?.response?.data.message === "Access denied.") {
+      setMessage("No tiene permisos para esta operación", "error");
     } else {
-      setIsError(false)
-      setMessage(`Registro ${selectedContent && selectedContent._id ? "Actualizado": "Creado"}`);
+      setMessage(
+        `Registro ${
+          selectedContent && selectedContent._id ? "Actualizado" : "Creado"
+        }`,
+        "success"
+      );
     }
 
     const updatedContents = await getContentList();
@@ -97,10 +115,6 @@ const ContentAdmin: React.FC = () => {
     { title: "Tema", render: (item: GetContentRes) => item.category.name },
   ];
 
-  const handleCloseSnackbar = () => {
-    setSnackbarOpen(false);
-  };
-
   return (
     <Box sx={{ padding: 3 }}>
       <Typography variant="h4" gutterBottom>
@@ -114,6 +128,7 @@ const ContentAdmin: React.FC = () => {
       >
         Add New Content
       </Button>
+      <SearchBar onSearch={handleSearch} />
       <DataTable
         data={contents}
         columns={columns}
@@ -131,11 +146,6 @@ const ContentAdmin: React.FC = () => {
           categories={categories}
         />
       </CustomModal>
-      <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-        <Alert onClose={handleCloseSnackbar} severity={isError ? "error": "success"} sx={{ width: '100%' }}>
-          {message}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 };

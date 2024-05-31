@@ -30,7 +30,6 @@ const UserForm: React.FC<UserFormProps> = ({
     handleSubmit,
     formState: { errors },
     reset,
-    setValue
   } = useForm<IUserForm>({
     defaultValues: {
         ...defaultValues,
@@ -66,7 +65,7 @@ const UserForm: React.FC<UserFormProps> = ({
         select
         fullWidth
         margin="normal"
-        defaultValue=""
+        defaultValue={defaultValues?.roles.length ? defaultValues.roles[0] : ""}
       >
         <MenuItem value="">Select a type</MenuItem>
         {roles.map((e: GetRolesRes) => (

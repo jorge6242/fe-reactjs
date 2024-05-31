@@ -27,7 +27,7 @@ const ContentForm: React.FC<ContentFormProps> = ({
   const { register, handleSubmit, reset, formState: { errors } } = useForm<IContentFormData>({
     defaultValues,
   });
-
+  console.log('defaultValues ', defaultValues);
   useEffect(() => {
     reset(defaultValues);
   }, [reset, defaultValues]);
@@ -48,7 +48,7 @@ const ContentForm: React.FC<ContentFormProps> = ({
         {...register("themeId", { required: "Theme is required" })}
         fullWidth
         margin="normal"
-        defaultValue=""
+        defaultValue={defaultValues?.themeId || ""}
       >
         {themes.map((theme) => (
           <MenuItem key={theme.id} value={theme.id}>
@@ -62,7 +62,7 @@ const ContentForm: React.FC<ContentFormProps> = ({
         {...register("categoryId", { required: "Category is required" })}
         fullWidth
         margin="normal"
-        defaultValue=""
+        defaultValue={defaultValues?.categoryId || ""}
       >
         {categories.map((category) => (
           <MenuItem key={category.id} value={category.id}>
